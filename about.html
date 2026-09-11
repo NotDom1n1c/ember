@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy — Ember</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/landing.css">
+</head>
+<body class="page grain">
+
+<div class="wrap">
+  <nav class="nav">
+    <a class="logo" href="index.html"><span class="logo-mark"></span>EMBER</a>
+    <div class="nav-links">
+      <a href="about.html" class="active">Privacy</a>
+      <a href="shortcuts.html">Shortcuts</a>
+    </div>
+    <a class="btn-accent" href="editor.html">Open Editor</a>
+  </nav>
+
+  <main class="prose">
+    <h1>Your pixels stay yours.</h1>
+
+    <p><strong>Ember is a fully client-side application.</strong> There is no server component
+    at all: no upload endpoint, no processing API, no analytics, no account system. The page
+    you load is static HTML, CSS and JavaScript — after that, everything happens inside your
+    browser's memory.</p>
+
+    <h2>How editing works</h2>
+    <p>When you open an image, your browser decodes it directly into an HTML5 Canvas. Filters
+    like brightness or blur are computed by JavaScript reading and rewriting raw pixel values
+    with <strong>getImageData / putImageData</strong>. Layers are composited with the canvas
+    API's native blend operations. When you export, the browser itself re-encodes the canvas
+    into a PNG, JPG or WebP file and hands it back to you as a download.</p>
+
+    <h2>What is stored, and where</h2>
+    <p>If you use <strong>“Save to browser”</strong>, your project (layer pixels and settings)
+    is written to your browser's local storage on your own device. It never travels anywhere.
+    You can also download a project file instead — a plain JSON file containing your layers —
+    and keep it wherever you like. Clearing your browser data removes saved projects.</p>
+
+    <h2>Verify it yourself</h2>
+    <p>Open your browser's DevTools, switch to the Network tab, and edit an image. Apart from
+    loading the app files and fonts once, you will see no requests — no matter how large the
+    image or how many edits you make. That's the whole privacy policy: there is nothing to
+    police, because nothing leaves the tab.</p>
+  </main>
+
+  <footer class="footer">
+    <a class="logo" href="index.html"><span class="logo-mark"></span>EMBER</a>
+    <span>Free forever. Local forever.</span>
+    <div class="footer-links">
+      <a href="editor.html">Editor</a>
+      <a href="about.html">Privacy</a>
+      <a href="shortcuts.html">Shortcuts</a>
+    </div>
+  </footer>
+</div>
+
+</body>
+</html>
