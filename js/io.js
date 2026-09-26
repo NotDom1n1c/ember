@@ -16,17 +16,21 @@ function initIO() {
   // drag & drop anywhere on the window
   let dragDepth = 0;
   const overlay = document.getElementById("drop-overlay");
+  const hasFiles = e => e.dataTransfer && [...e.dataTransfer.types].includes("Files");
   window.addEventListener("dragenter", e => {
+    if (!hasFiles(e)) return; // internal drags (layer reordering) must not trigger the overlay
     e.preventDefault();
     dragDepth++;
     overlay.hidden = false;
   });
-  window.addEventListener("dragover", e => e.preventDefault());
-  window.addEventListener("dragleave", () => {
+  window.addEventListener("dragover", e => { if (hasFiles(e)) e.preventDefault(); });
+  window.addEventListener("dragleave", e => {
+    if (!hasFiles(e)) return;
     dragDepth = Math.max(0, dragDepth - 1);
     if (!dragDepth) overlay.hidden = true;
   });
   window.addEventListener("drop", e => {
+    if (!hasFiles(e)) return;
     e.preventDefault();
     dragDepth = 0;
     overlay.hidden = true;
@@ -68,6 +72,7 @@ function initIO() {
   document.getElementById("btn-export-cancel").addEventListener("click", () =>
     document.getElementById("modal-export").hidden = true);
   document.getElementById("btn-export-download").addEventListener("click", downloadExport);
+  document.getElementById("btn-export-copy").addEventListener("click", copyToClipboard);
 }
 
 function pickFiles(mode) {
@@ -197,6 +202,22 @@ function downloadExport() {
   else buildExportBlob(doIt);
 }
 
+async function copyToClipboard() {
+  if (!App.project) return;
+  if (!navigator.clipboard || typeof ClipboardItem === "undefined") {
+    toast("Clipboard images aren't supported in this browser");
+    return;
+  }
+  try {
+    // the clipboard only takes PNG reliably, whatever export format is selected
+    const blob = await new Promise(res => compositeProject(1).toBlob(res, "image/png"));
+    await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+    toast("Copied " + App.project.width + " × " + App.project.height + " PNG to clipboard");
+  } catch (e) {
+    toast("Couldn't copy — the browser blocked clipboard access");
+  }
+}
+
 function humanSize(n) {
   if (n < 1024) return n + " B";
   if (n < 1048576) return (n / 1024).toFixed(1) + " KB";
@@ -248,6 +269,9 @@ async function loadProjectData(data) {
         img.src = ld.data;
       });
     } else if (layer.type === "text" && layer.text) {
+      // wait for the web font, otherwise the text is rasterized in a fallback face
+      try { await document.fonts.load((layer.text.bold ? "700 " : "400 ") + layer.text.size + 'px "' + layer.text.font + '"'); }
+      catch (e) { /* font loading API unavailable */ }
       renderTextLayer(layer);
     }
     layers.push(layer);
@@ -292,7 +316,8 @@ function downloadProjectFile() {
   const blob = new Blob([JSON.stringify(serializeProject())], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "project.ember";
+  const base = (App.project.layers[0] && App.project.layers[0].name) || "project";
+  a.download = (base.replace(/[^\w\- ]+/g, "").trim().replace(/\s+/g, "-").toLowerCase() || "project") + ".ember";
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   App.dirty = false;

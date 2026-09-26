@@ -6,7 +6,7 @@
 function defaultFilters() {
   return {
     brightness: 0, contrast: 0, saturation: 0, hue: 0,
-    blur: 0,
+    blur: 0, sharpen: 0, vignette: 0,
     grayscale: false, sepia: false, invert: false,
     curves: null // { rgb:[[x,y],...], r:[...], g:[...], b:[...] }
   };
@@ -27,6 +27,7 @@ function curvesActive(c) {
 function filtersActive(f) {
   return !!(f && (
     f.brightness || f.contrast || f.saturation || f.hue || f.blur ||
+    f.sharpen || f.vignette ||
     f.grayscale || f.sepia || f.invert || curvesActive(f.curves)
   ));
 }
@@ -224,15 +225,48 @@ function boxBlur(img, w, h, radius) {
   }
 }
 
-/* ---------- entry point used by the render cache ---------- */
+/* ---------- unsharp mask: out = orig + amount * (orig - blurred) ---------- */
 
-function applyFiltersToCanvas(src, f) {
-  const out = makeCanvas(src.width, src.height);
+function sharpenImage(img, w, h, amount) {
+  const d = img.data;
+  const soft = new ImageData(new Uint8ClampedArray(d), w, h);
+  boxBlur(soft, w, h, 1);
+  const s = soft.data, k = amount / 100 * 1.6;
+  for (let i = 0; i < d.length; i += 4) {
+    d[i] = d[i] + k * (d[i] - s[i]);
+    d[i + 1] = d[i + 1] + k * (d[i + 1] - s[i + 1]);
+    d[i + 2] = d[i + 2] + k * (d[i + 2] - s[i + 2]);
+  }
+}
+
+/* ---------- vignette: radial darkening towards the layer edges ---------- */
+
+function vignetteImage(img, w, h, amount) {
+  const d = img.data, k = amount / 100 * 0.85;
+  const cx = w / 2, cy = h / 2, inv = 1 / (cx * cx + cy * cy);
+  for (let y = 0, i = 0; y < h; y++) {
+    const dy2 = (y - cy) * (y - cy);
+    for (let x = 0; x < w; x++, i += 4) {
+      const r2 = ((x - cx) * (x - cx) + dy2) * inv;
+      const v = 1 - k * r2 * r2 * 1.6;
+      const m = v < 0 ? 0 : v;
+      d[i] *= m; d[i + 1] *= m; d[i + 2] *= m;
+    }
+  }
+}
+
+/* ---------- entry point used by the render cache ----------
+   scale < 1 renders a low-res draft (used while a slider is being dragged) */
+
+function applyFiltersToCanvas(src, f, scale = 1) {
+  const out = makeCanvas(src.width * scale, src.height * scale);
   const ctx = out.getContext("2d");
-  ctx.drawImage(src, 0, 0);
+  ctx.drawImage(src, 0, 0, out.width, out.height);
   const img = ctx.getImageData(0, 0, out.width, out.height);
   applyPixelFilters(img.data, f);
-  if (f.blur > 0) boxBlur(img, out.width, out.height, f.blur);
+  if (f.blur > 0) boxBlur(img, out.width, out.height, Math.max(1, f.blur * scale));
+  if (f.sharpen > 0) sharpenImage(img, out.width, out.height, f.sharpen);
+  if (f.vignette > 0) vignetteImage(img, out.width, out.height, f.vignette);
   ctx.putImageData(img, 0, 0);
   return out;
 }

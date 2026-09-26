@@ -7,129 +7,224 @@
 <meta name="description" content="A free, private, browser-based image editor. Layers, filters, crop, brush, text and real export — nothing ever leaves your browser.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/landing.css">
+<link rel="stylesheet" href="css/home.css?v=3">
 </head>
-<body class="page grain">
+<body class="home grain">
 
-<div class="wrap">
-  <nav class="nav">
-    <a class="logo" href="index.html"><span class="logo-mark"></span>EMBER</a>
-    <div class="nav-links">
-      <a href="about.html">Privacy</a>
-      <a href="shortcuts.html">Shortcuts</a>
-    </div>
-    <a class="btn-accent" href="editor.html">Open Editor</a>
-  </nav>
+<!-- ================= NAV ================= -->
+<nav class="hnav">
+  <a class="hlogo" href="index.html"><span class="hlogo-mark"></span>EMBER</a>
+  <div class="hnav-links">
+    <a href="#develop">Demo</a>
+    <a href="#sheet">Features</a>
+    <a href="about.html">Privacy</a>
+    <a href="shortcuts.html">Shortcuts</a>
+  </div>
+  <a class="netpill" href="#monitor" title="Live count of network requests since this page finished loading">
+    <span class="netpill-dot"></span><span data-net-count>0</span>&nbsp;uploads
+  </a>
+  <a class="hbtn hbtn-sm" href="editor.html">Open Editor</a>
+</nav>
 
-  <header class="hero">
-    <div class="hero-kicker reveal">PIXELS, NOT PROMISES</div>
-    <h1 class="reveal d1">The darkroom that lives in a <em>browser tab</em>.</h1>
-    <p class="hero-sub reveal d2">
-      A free, private, browser-based image editor — no uploads, no accounts.
-      Layers, blend modes, non-destructive filters, crop, brush, text and real
-      PNG / JPG / WebP export, all computed locally on your machine.
+<!-- ================= HERO ================= -->
+<header class="hero" id="develop">
+  <div class="hero-copy">
+    <p class="kicker rise" style="--d:0"><span class="kicker-rec"></span>PIXELS, NOT PROMISES</p>
+    <h1 class="hero-title">
+      <span class="line"><span class="rise" style="--d:1">The darkroom</span></span>
+      <span class="line"><span class="rise" style="--d:2">that lives in a</span></span>
+      <span class="line"><em class="rise" style="--d:3">browser tab.</em></span>
+    </h1>
+    <p class="hero-sub rise" style="--d:4">
+      Layers, blend modes, curves, crop, brush, text and real PNG / JPG / WebP export.
+      Every pixel is computed on <strong>your</strong> machine. No uploads. No accounts. No kidding.
     </p>
-    <div class="hero-cta reveal d3">
-      <a class="btn-accent" href="editor.html">Open Editor</a>
-      <a class="btn-ghost" href="about.html">How privacy works</a>
-    </div>
-    <p class="hero-note reveal d4">zero servers · zero uploads · zero tracking</p>
-  </header>
-
-  <!-- stylized editor mock -->
-  <div class="mock reveal d4" aria-hidden="true">
-    <div class="mock-titlebar">
-      <span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span>
-      <span class="mock-title">sunset-dunes.png — 2400 × 1600 — 100%</span>
-    </div>
-    <div class="mock-body">
-      <div class="mock-tools">
-        <span class="mock-tool"></span><span class="mock-tool on"></span><span class="mock-tool"></span>
-        <span class="mock-tool"></span><span class="mock-tool"></span><span class="mock-tool"></span>
-      </div>
-      <div class="mock-canvas">
-        <div class="mock-photo"></div>
-        <span class="mock-handle" style="top:36px; left:56px;"></span>
-        <span class="mock-handle" style="top:36px; right:56px;"></span>
-        <span class="mock-handle" style="bottom:36px; left:56px;"></span>
-        <span class="mock-handle" style="bottom:36px; right:56px;"></span>
-      </div>
-      <div class="mock-panel">
-        <div class="mock-label">LAYERS</div>
-        <div class="mock-layer on"><span class="mock-swatch"></span>glow pass</div>
-        <div class="mock-layer"><span class="mock-swatch" style="background:linear-gradient(135deg,#333,#111)"></span>base photo</div>
-        <div class="mock-label">ADJUSTMENTS</div>
-        <div class="mock-slider"></div>
-        <div class="mock-slider" style="margin-top:14px"></div>
-      </div>
+    <div class="hero-cta rise" style="--d:5">
+      <a class="hbtn" href="editor.html">
+        Open the darkroom
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <label class="hbtn-ghost" for="demo-file">
+        <svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+        Try it on your photo
+      </label>
     </div>
   </div>
 
-  <section>
-    <h2 class="section-title">A real editor. Really local.</h2>
-    <p class="section-sub">
-      Every operation manipulates actual pixel data on a canvas — no CSS-filter fakery.
-      What you export is exactly what you edited.
-    </p>
-    <div class="features">
-      <div class="feature">
-        <svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/><path d="M3 17l9 5 9-5"/></svg>
-        <h3>Layers &amp; blend modes</h3>
-        <p>Stack, reorder, merge and flatten. Per-layer opacity and real composite blend modes: multiply, screen, overlay and more.</p>
-      </div>
-      <div class="feature">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
-        <h3>Non-destructive filters</h3>
-        <p>Brightness, contrast, saturation, hue, blur, grayscale, sepia, invert and a curves editor — stacked per layer, applied on render.</p>
-      </div>
-      <div class="feature">
-        <svg viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
-        <h3>Crop &amp; transform</h3>
-        <p>Pixel-accurate crop with ratio presets, plus free move, scale and rotate with on-canvas handles.</p>
-      </div>
-      <div class="feature">
-        <svg viewBox="0 0 24 24"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg>
-        <h3>Brush, shapes &amp; text</h3>
-        <p>Pressure-smooth brush and eraser, rectangle / ellipse / line shapes, and editable text layers with font controls.</p>
-      </div>
-      <div class="feature">
-        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-        <h3>Real export</h3>
-        <p>PNG, JPG or WebP with a quality slider and live estimated file size. Genuine re-encoded images, full resolution.</p>
-      </div>
-      <div class="feature">
-        <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
-        <h3>Save &amp; resume</h3>
-        <p>Save projects to your browser or download them as a portable file — pick up your edit later, no account needed.</p>
-      </div>
+  <!-- the live demo -->
+  <div class="stage-wrap rise" style="--d:3">
+    <div class="stage-meta">
+      <span>FRAME 01A</span>
+      <span data-meta-size>— × —</span>
+      <span class="stage-meta-live"><i></i>LIVE CANVAS</span>
     </div>
-  </section>
+    <div class="stage" id="stage" tabindex="-1">
+      <canvas id="demo" aria-label="Interactive before and after image editing demo"></canvas>
+      <div class="split" id="split">
+        <span class="split-tag split-tag-l">ORIGINAL</span>
+        <span class="split-tag split-tag-r" data-fx-name>EMBER GRADE</span>
+        <button class="split-knob" id="knob" aria-label="Drag to compare original and edited" role="slider"
+                aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+          <svg viewBox="0 0 24 24"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+      <div class="drop-hint" id="drop-hint">
+        <svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+        Drop it. It stays right here.
+      </div>
+      <i class="reg reg-tl"></i><i class="reg reg-tr"></i><i class="reg reg-bl"></i><i class="reg reg-br"></i>
+    </div>
+    <div class="fx-bar" role="radiogroup" aria-label="Choose an edit">
+      <button class="fx on" data-fx="ember" role="radio" aria-checked="true"><i style="--c:#ff5c1a"></i>Ember</button>
+      <button class="fx" data-fx="mono" role="radio" aria-checked="false"><i style="--c:#d9d6cf"></i>Silver</button>
+      <button class="fx" data-fx="cross" role="radio" aria-checked="false"><i style="--c:#5fd3a8"></i>Cross-process</button>
+      <button class="fx" data-fx="duo" role="radio" aria-checked="false"><i style="--c:#6a5cff"></i>Duotone</button>
+      <button class="fx" data-fx="negative" role="radio" aria-checked="false"><i style="--c:#3fb6ff"></i>Negative</button>
+      <button class="fx" data-fx="pixel" role="radio" aria-checked="false"><i style="--c:#ffd24a"></i>Pixelate</button>
+    </div>
+    <div class="stage-foot">
+      <span>computed in <b data-fx-ms>—</b> ms · <b data-fx-px>—</b> pixels touched</span>
+      <span>drag the handle · drop a photo · 0 bytes sent</span>
+    </div>
+    <input type="file" id="demo-file" accept="image/*" hidden>
+  </div>
+</header>
 
-  <section class="privacy">
-    <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-    <div>
-      <h2>Nothing leaves this tab.</h2>
-      <p>
-        Ember has no backend. Your images are decoded, edited and re-encoded entirely by your
-        own browser using the HTML5 Canvas API — there is no upload endpoint to send them to.
-        Close the tab and they're gone. You can verify it yourself: open DevTools and watch
-        the network panel stay <code>silent</code> while you edit.
-      </p>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <a class="logo" href="index.html"><span class="logo-mark"></span>EMBER</a>
-    <span>Free forever. Local forever.</span>
-    <div class="footer-links">
-      <a href="editor.html">Editor</a>
-      <a href="about.html">Privacy</a>
-      <a href="shortcuts.html">Shortcuts</a>
-    </div>
-  </footer>
+<!-- ================= FILM MARQUEE ================= -->
+<div class="film" aria-hidden="true">
+  <div class="film-track">
+    <span>EMBER 400</span><b>▸ 12A</b><span>LAYERS</span><b>◆</b><span>BLEND MODES</span><b>◆</b><span>CURVES</span><b>▸ 13</b><span>CROP</span><b>◆</b><span>BRUSH</span><b>◆</b><span>TEXT</span><b>▸ 13A</b><span>PNG · JPG · WEBP</span><b>◆</b><span>NO UPLOADS</span><b>▸ 14</b>
+    <span>EMBER 400</span><b>▸ 12A</b><span>LAYERS</span><b>◆</b><span>BLEND MODES</span><b>◆</b><span>CURVES</span><b>▸ 13</b><span>CROP</span><b>◆</b><span>BRUSH</span><b>◆</b><span>TEXT</span><b>▸ 13A</b><span>PNG · JPG · WEBP</span><b>◆</b><span>NO UPLOADS</span><b>▸ 14</b>
+  </div>
 </div>
 
+<!-- ================= CONTACT SHEET ================= -->
+<section class="sheet-sec" id="sheet">
+  <div class="sec-head">
+    <p class="kicker">CONTACT SHEET — 6 EXPOSURES</p>
+    <h2 class="sec-title">A real editor.<br><em>Really</em> local.</h2>
+    <p class="sec-sub">Every tool manipulates actual pixel data on a canvas. No CSS-filter fakery — what you export is exactly what you edited. Hover a frame.</p>
+  </div>
+
+  <div class="sheet">
+    <article class="frame" style="--i:0">
+      <div class="frame-img fi-layers">
+        <span class="ly ly1"></span><span class="ly ly2"></span><span class="ly ly3"></span>
+      </div>
+      <div class="frame-cap"><b>01A</b><h3>Layers &amp; blend modes</h3></div>
+      <p>Stack, reorder, merge, flatten. Per-layer opacity and real multiply, screen, overlay and more.</p>
+      <svg class="pencil" viewBox="0 0 200 140" preserveAspectRatio="none"><path d="M100 8C40 6 8 34 10 72c2 40 48 62 98 60 52-2 84-30 82-66C188 30 150 6 96 12"/></svg>
+    </article>
+
+    <article class="frame" style="--i:1">
+      <div class="frame-img fi-curves">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path class="grid" d="M25 0V100M50 0V100M75 0V100M0 25H100M0 50H100M0 75H100"/>
+          <path class="curve" pathLength="200" d="M0 100 C 30 100, 20 50, 50 50 S 70 0, 100 0"/>
+          <path class="curve-lin" d="M0 100 L100 0"/>
+        </svg>
+      </div>
+      <div class="frame-cap"><b>02</b><h3>Non-destructive filters</h3></div>
+      <p>8 one-click looks, brightness, contrast, hue, blur, sharpen, vignette and a real curves editor. Hold <kbd class="k">\</kbd> to compare.</p>
+      <svg class="pencil" viewBox="0 0 200 140" preserveAspectRatio="none"><path d="M100 8C40 6 8 34 10 72c2 40 48 62 98 60 52-2 84-30 82-66C188 30 150 6 96 12"/></svg>
+    </article>
+
+    <article class="frame" style="--i:2">
+      <div class="frame-img fi-crop">
+        <div class="crop-photo"></div>
+        <div class="crop-box"><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="frame-cap"><b>02A</b><h3>Crop &amp; transform</h3></div>
+      <p>Pixel-accurate crop with ratio presets, lossless resize, rotate 90° and flip. Move, scale and rotate with handles.</p>
+      <svg class="pencil" viewBox="0 0 200 140" preserveAspectRatio="none"><path d="M100 8C40 6 8 34 10 72c2 40 48 62 98 60 52-2 84-30 82-66C188 30 150 6 96 12"/></svg>
+    </article>
+
+    <article class="frame" style="--i:3">
+      <div class="frame-img fi-brush">
+        <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid meet">
+          <path class="stroke" d="M18 86c22-40 40-58 58-40s10 46 34 36 26-62 48-58 22 30 28 34"/>
+          <text x="22" y="40" class="tx">Aa</text>
+        </svg>
+      </div>
+      <div class="frame-cap"><b>03</b><h3>Brush, shapes &amp; text</h3></div>
+      <p>Smoothed brush and eraser, rectangle / ellipse / line, and editable text layers.</p>
+      <svg class="pencil" viewBox="0 0 200 140" preserveAspectRatio="none"><path d="M100 8C40 6 8 34 10 72c2 40 48 62 98 60 52-2 84-30 82-66C188 30 150 6 96 12"/></svg>
+    </article>
+
+    <article class="frame" style="--i:4">
+      <div class="frame-img fi-export">
+        <div class="exp-roll"><span>.PNG <em>4.1 MB</em></span><span>.JPG <em>812 KB</em></span><span>.WEBP <em>498 KB</em></span><span>.PNG <em>4.1 MB</em></span></div>
+        <div class="exp-bar"><i></i></div>
+      </div>
+      <div class="frame-cap"><b>03A</b><h3>Real export</h3></div>
+      <p>PNG, JPG or WebP with a quality slider and live size estimate, or copy straight to the clipboard.</p>
+      <svg class="pencil" viewBox="0 0 200 140" preserveAspectRatio="none"><path d="M100 8C40 6 8 34 10 72c2 40 48 62 98 60 52-2 84-30 82-66C188 30 150 6 96 12"/></svg>
+    </article>
+
+    <article class="frame" style="--i:5">
+      <div class="frame-img fi-save">
+        <div class="file"><span>.ember</span></div>
+        <div class="save-dots"><i></i><i></i><i></i></div>
+      </div>
+      <div class="frame-cap"><b>04</b><h3>Save &amp; resume</h3></div>
+      <p>Keep projects in your browser or download a portable file. Pick up later, no account needed.</p>
+      <svg class="pencil" viewBox="0 0 200 140" preserveAspectRatio="none"><path d="M100 8C40 6 8 34 10 72c2 40 48 62 98 60 52-2 84-30 82-66C188 30 150 6 96 12"/></svg>
+    </article>
+  </div>
+</section>
+
+<!-- ================= PRIVACY / MONITOR ================= -->
+<section class="quiet" id="monitor">
+  <div class="quiet-copy">
+    <p class="kicker">DON'T TRUST US. WATCH.</p>
+    <h2 class="quiet-title">Nothing<br>leaves<br><em>this tab.</em></h2>
+    <p class="sec-sub">
+      Ember has no backend and no upload endpoint. Images are decoded, edited and re-encoded by your own
+      browser with the Canvas API. The panel on the right isn't a mock-up: it listens to this page's real
+      network activity since it loaded. Drop a photo in the demo above and watch it stay at zero.
+    </p>
+  </div>
+
+  <div class="monitor">
+    <div class="mon-head">
+      <span class="mon-dot"></span>NETWORK MONITOR <span class="mon-clock" data-uptime>00:00:00</span>
+    </div>
+    <div class="mon-scope"><canvas id="scope"></canvas><span class="mon-flat">flatline — that's the point</span></div>
+    <dl class="mon-stats">
+      <div><dt>requests since load</dt><dd data-net-count>0</dd></div>
+      <div><dt>bytes uploaded</dt><dd>0 B</dd></div>
+      <div><dt>images processed locally</dt><dd data-local-count>1</dd></div>
+      <div><dt>servers that saw your photo</dt><dd>none</dd></div>
+    </dl>
+    <ol class="mon-log" data-net-log>
+      <li><time data-boot-time>--:--:--</time> page loaded · listening…</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= FINALE ================= -->
+<section class="finale">
+  <canvas id="embers" aria-hidden="true"></canvas>
+  <p class="kicker">FREE FOREVER · LOCAL FOREVER</p>
+  <h2 class="finale-word" aria-label="Ember">EMBER</h2>
+  <a class="hbtn hbtn-xl" href="editor.html">
+    Start editing — it's already loaded
+    <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+  </a>
+</section>
+
+<footer class="hfoot">
+  <a class="hlogo" href="index.html"><span class="hlogo-mark"></span>EMBER</a>
+  <span>Made of pixels and zero servers.</span>
+  <div class="hfoot-links">
+    <a href="editor.html">Editor</a>
+    <a href="about.html">Privacy</a>
+    <a href="shortcuts.html">Shortcuts</a>
+  </div>
+</footer>
+
+<script src="js/home.js?v=2"></script>
 </body>
 </html>

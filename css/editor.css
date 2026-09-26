@@ -517,3 +517,50 @@ input[type="color"] {
 }
 .toast.leaving { opacity: 0; transform: translateY(8px); transition: all 0.3s ease; }
 @keyframes toast-in { from { opacity: 0; transform: translateY(12px); } }
+
+/* ---------------- v2 additions ---------------- */
+.menu-btn { white-space: nowrap; }
+.dropdown-menu button { white-space: nowrap; }
+
+.panel-sub {
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-2);
+  margin: 14px 0 8px;
+}
+.looks-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 4px; }
+.look-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 6px 2px 5px; border-radius: var(--radius-s);
+  border: 1px solid var(--border); background: var(--bg-2);
+  font-size: 11px; color: var(--text-1);
+  transition: border-color .15s, color .15s, transform .15s;
+}
+.look-btn i { width: 100%; max-width: 44px; height: 26px; border-radius: 3px; background: linear-gradient(135deg, var(--a), var(--b)); }
+.look-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--text-0); transform: translateY(-1px); }
+.look-btn:disabled { opacity: .4; cursor: default; }
+
+kbd {
+  font-family: var(--font-mono); font-size: 11px;
+  padding: 1px 5px; border-radius: 3px;
+  border: 1px solid var(--border-strong); background: var(--bg-3); color: var(--text-0);
+}
+
+#compare-badge {
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em;
+  padding: 6px 12px; border-radius: 999px;
+  background: rgba(0, 0, 0, .7); color: #fff; border: 1px solid var(--accent);
+  pointer-events: none; z-index: 5;
+}
+
+@media (max-width: 980px) {
+  #workspace { grid-template-columns: 44px 1fr 236px; }
+  .looks-grid { grid-template-columns: repeat(2, 1fr); }
+  #topbar { gap: 8px; }
+  .menu-btn { padding: 6px 8px; }
+}
+@media (max-width: 900px) {
+  #topbar .logo { font-size: 0; gap: 0; margin-right: 0; }
+  #topbar { padding: 0 10px; }
+  .zoom-group .zoom-value { min-width: 0; padding: 0 4px; }
+}

@@ -118,7 +118,7 @@ function mergeDown() {
     ctx.globalCompositeOperation = layer.blendMode;
     const m = layerMatrix(layer);
     ctx.transform(m.a, m.b, m.c, m.d, m.e, m.f);
-    ctx.drawImage(getRenderedLayer(layer), 0, 0);
+    ctx.drawImage(getRenderedLayer(layer), 0, 0, layer.canvas.width, layer.canvas.height);
     ctx.restore();
   }
   below.canvas = merged;
@@ -362,7 +362,7 @@ function initLayersPanel() {
 
 /* ============ adjustments panel ============ */
 
-const ADJ_SLIDERS = ["brightness", "contrast", "saturation", "hue", "blur"];
+const ADJ_SLIDERS = ["brightness", "contrast", "saturation", "hue", "blur", "sharpen", "vignette"];
 const ADJ_CHECKS = ["grayscale", "sepia", "invert"];
 let _adjOld = null;
 
@@ -389,6 +389,7 @@ function refreshAdjustPanel() {
     c.checked = off ? false : !!l.filters[k];
   }
   document.getElementById("btn-curves").disabled = off;
+  document.querySelectorAll("#looks-grid [data-look]").forEach(b => { b.disabled = off; });
   document.getElementById("btn-adj-reset").disabled = off;
   document.getElementById("adjust-note").textContent = off
     ? "Open a document to adjust layers."
@@ -402,11 +403,14 @@ function initAdjustPanel() {
       const l = activeLayer();
       if (!l) return;
       if (_adjOld === null) _adjOld = JSON.parse(JSON.stringify(l.filters));
+      App.draft = true;
       l.filters[k] = +s.value;
       document.getElementById("adj-" + k + "-val").textContent = s.value;
       requestRender();
     });
     s.addEventListener("change", () => {
+      App.draft = false;
+      requestRender();
       const l = activeLayer();
       if (!l || _adjOld === null) return;
       commitFilterChange(l, _adjOld, "Adjust " + k);
@@ -435,6 +439,51 @@ function initAdjustPanel() {
   });
   document.getElementById("btn-curves").addEventListener("click", openCurves);
   initCurves();
+  initLooks();
+}
+
+/* ============ looks: one-click presets built from the normal filter stack ============ */
+
+const LOOKS = {
+  none:   {},
+  ember:  { contrast: 18, saturation: 12, vignette: 35,
+            curves: { rgb: [[0, 0], [64, 52], [192, 206], [255, 255]], r: [[0, 8], [255, 255]], g: [[0, 0], [255, 245]], b: [[0, 0], [255, 214]] } },
+  silver: { grayscale: true, contrast: 30, vignette: 25,
+            curves: { rgb: [[0, 10], [70, 52], [190, 208], [255, 250]] } },
+  cross:  { saturation: 20,
+            curves: { r: [[0, 0], [70, 50], [190, 215], [255, 255]], g: [[0, 10], [128, 140], [255, 250]], b: [[0, 45], [255, 200]] } },
+  fade:   { contrast: -12, saturation: -25,
+            curves: { rgb: [[0, 36], [128, 132], [255, 236]] } },
+  vivid:  { saturation: 40, contrast: 14, sharpen: 30 },
+  noir:   { grayscale: true, contrast: 45, brightness: -8, vignette: 55, sharpen: 25 },
+  retro:  { sepia: true, contrast: 10, vignette: 40,
+            curves: { rgb: [[0, 24], [255, 238]] } }
+};
+
+function lookFilters(name) {
+  const f = defaultFilters();
+  const look = LOOKS[name] || {};
+  for (const k of Object.keys(look)) {
+    if (k === "curves") {
+      f.curves = { rgb: defaultCurvePoints(), r: defaultCurvePoints(), g: defaultCurvePoints(), b: defaultCurvePoints() };
+      for (const ch of Object.keys(look.curves)) f.curves[ch] = look.curves[ch].map(p => p.slice());
+    } else f[k] = look[k];
+  }
+  return f;
+}
+
+function initLooks() {
+  document.querySelectorAll("#looks-grid [data-look]").forEach(b => {
+    b.addEventListener("click", () => {
+      const l = activeLayer();
+      if (!l) return;
+      const old = JSON.parse(JSON.stringify(l.filters));
+      l.filters = lookFilters(b.dataset.look);
+      commitFilterChange(l, old, "Look: " + b.textContent.trim());
+      refreshAdjustPanel();
+      requestRender();
+    });
+  });
 }
 
 /* ============ curves editor ============ */
@@ -560,11 +609,16 @@ function initCurves() {
     let idx = hitPoint(x, y);
     if (idx < 0) {
       const c = canvasToCurve(x, y);
-      pts.push([Math.round(c.x), Math.round(c.y)]);
-      pts.sort((a, b) => a[0] - b[0]);
-      idx = pts.findIndex(p => p[0] === Math.round(c.x));
+      const cx = Math.round(c.x);
+      idx = pts.findIndex(p => p[0] === cx);
+      if (idx < 0) {
+        pts.push([cx, Math.round(c.y)]);
+        pts.sort((a, b) => a[0] - b[0]);
+        idx = pts.findIndex(p => p[0] === cx);
+      } else pts[idx][1] = Math.round(c.y);
     }
     Curves.drag = idx;
+    App.draft = true;
     drawCurves();
     requestRender();
   });
@@ -582,7 +636,12 @@ function initCurves() {
     drawCurves();
     requestRender();
   });
-  window.addEventListener("pointerup", () => { Curves.drag = null; });
+  window.addEventListener("pointerup", () => {
+    if (Curves.drag === null) return;
+    Curves.drag = null;
+    App.draft = false;
+    requestRender();
+  });
   cvs.addEventListener("dblclick", e => {
     const pts = getPts();
     if (!pts || pts.length <= 2) return;
@@ -650,6 +709,8 @@ function refreshPropsPanel() {
   if (App.tool === "eraser") {
     document.getElementById("eraser-size").value = App.options.eraser.size;
     document.getElementById("eraser-size-val").textContent = App.options.eraser.size;
+    document.getElementById("eraser-opacity").value = App.options.eraser.opacity;
+    document.getElementById("eraser-opacity-val").textContent = App.options.eraser.opacity;
   }
   if (App.tool === "eyedropper") {
     document.getElementById("eyedrop-swatch").style.background = App.color;

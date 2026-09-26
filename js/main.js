@@ -20,6 +20,11 @@ function updateCursorStatus(p) {
     Math.round(p.x) + ", " + Math.round(p.y);
 }
 
+function setCompareBadge(on) {
+  const b = document.getElementById("compare-badge");
+  if (b) b.hidden = !on;
+}
+
 function openModal(id) { document.getElementById(id).hidden = false; }
 function closeModal(id) { document.getElementById(id).hidden = true; }
 
@@ -32,6 +37,7 @@ function init() {
   initTools();
   initPanels();
   initIO();
+  initImageOps();
 
   // ---- left toolbar ----
   document.querySelectorAll(".tool-btn").forEach(b =>
@@ -61,14 +67,20 @@ function init() {
     pickFiles("import");
   });
 
-  // save dropdown
-  const saveMenu = document.getElementById("save-menu");
-  document.getElementById("btn-save").addEventListener("click", e => {
-    e.stopPropagation();
-    saveMenu.hidden = !saveMenu.hidden;
+  // dropdown menus (Image, Save)
+  const menus = [["btn-image", "image-menu"], ["btn-save", "save-menu"]].map(([b, m]) =>
+    [document.getElementById(b), document.getElementById(m)]);
+  menus.forEach(([btn, menu]) => {
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+      const open = menu.hidden;
+      menus.forEach(([, m]) => { m.hidden = true; });
+      menu.hidden = !open;
+    });
+    menu.addEventListener("click", e => e.stopPropagation());
   });
-  document.addEventListener("click", () => { saveMenu.hidden = true; });
-  saveMenu.addEventListener("click", e => e.stopPropagation());
+  document.addEventListener("click", () => menus.forEach(([, m]) => { m.hidden = true; }));
+  const saveMenu = document.getElementById("save-menu");
   document.getElementById("btn-save-browser").addEventListener("click", () => {
     saveMenu.hidden = true;
     saveToBrowser();
@@ -105,6 +117,10 @@ function init() {
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("keyup", e => {
     if (e.code === "Space") { Tools.spaceDown = false; updateCanvasCursor(); }
+    if (e.code === "Backslash" && App.compare) { App.compare = false; setCompareBadge(false); requestRender(); }
+  });
+  window.addEventListener("blur", () => {
+    if (App.compare) { App.compare = false; setCompareBadge(false); requestRender(); }
   });
   window.addEventListener("beforeunload", e => {
     if (App.dirty) { e.preventDefault(); e.returnValue = ""; }
@@ -118,6 +134,11 @@ function init() {
 function onKeyDown(e) {
   const typing = isTypingTarget(document.activeElement);
 
+  if (e.code === "Backslash" && !typing && App.project) {
+    e.preventDefault();
+    if (!App.compare) { App.compare = true; setCompareBadge(true); requestRender(); }
+    return;
+  }
   if (e.code === "Space" && !typing) {
     if (!Tools.spaceDown) { Tools.spaceDown = true; updateCanvasCursor(); }
     e.preventDefault();
@@ -125,8 +146,8 @@ function onKeyDown(e) {
   }
   if (e.key === "Escape") {
     const curves = document.getElementById("modal-curves");
-    if (!curves.hidden) { closeCurves(true); return; }
-    for (const id of ["modal-new", "modal-export"]) {
+    if (!curves.hidden) { closeCurves(false); return; }
+    for (const id of ["modal-new", "modal-export", "modal-resize"]) {
       const m = document.getElementById(id);
       if (!m.hidden) { m.hidden = true; return; }
     }

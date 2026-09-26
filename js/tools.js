@@ -724,6 +724,7 @@ function sampleColorAt(sx, sy) {
   const x = Math.floor(p.x * s), y = Math.floor(p.y * s);
   if (x < 0 || y < 0 || x >= comp.width || y >= comp.height) return null;
   const d = comp.getContext("2d").getImageData(x, y, 1, 1).data;
+  if (d[3] < 8) return null; // transparent pixel: nothing to sample
   const hex = "#" + [d[0], d[1], d[2]].map(v => v.toString(16).padStart(2, "0")).join("");
   setPrimaryColor(hex);
   const sw = document.getElementById("eyedrop-swatch");

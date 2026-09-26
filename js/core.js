@@ -16,6 +16,8 @@ const App = {
   crop: null,     // {x,y,w,h} in project coords while crop tool is active
   stroke: null,   // live brush stroke {layerId, canvas, alpha, erase}
   _comp: null, _compScale: 1, _compDirty: true,
+  draft: false,   // true while a slider is dragged -> filters render at low res
+  compare: false, // true while the backslash key is held -> show layers without filters
   options: {
     brush: { size: 24, opacity: 100 },
     eraser: { size: 32, opacity: 100 },
@@ -103,11 +105,14 @@ function transformPoint(m, x, y) {
 }
 
 /* filtered-layer cache (non-destructive filters applied on render) */
+const DRAFT_MAX = 1200;
 function getRenderedLayer(layer) {
-  if (!filtersActive(layer.filters)) return layer.canvas;
-  const key = JSON.stringify(layer.filters) + "|" + layer._rev;
+  if (App.compare || !filtersActive(layer.filters)) return layer.canvas;
+  const big = Math.max(layer.canvas.width, layer.canvas.height);
+  const scale = App.draft && big > DRAFT_MAX ? DRAFT_MAX / big : 1;
+  const key = JSON.stringify(layer.filters) + "|" + layer._rev + "|" + scale;
   if (layer._cache && layer._cacheKey === key) return layer._cache;
-  const out = applyFiltersToCanvas(layer.canvas, layer.filters);
+  const out = applyFiltersToCanvas(layer.canvas, layer.filters, scale);
   layer._cache = out;
   layer._cacheKey = key;
   return out;
@@ -130,7 +135,7 @@ function compositeProject(scale = 1, opts = {}) {
     if (App.stroke && App.stroke.layerId === layer.id) {
       const tmp = makeCanvas(layer.canvas.width, layer.canvas.height);
       const tctx = tmp.getContext("2d");
-      tctx.drawImage(src, 0, 0);
+      tctx.drawImage(src, 0, 0, tmp.width, tmp.height);
       tctx.globalAlpha = App.stroke.alpha;
       tctx.globalCompositeOperation = App.stroke.erase ? "destination-out" : "source-over";
       tctx.drawImage(App.stroke.canvas, 0, 0);
@@ -141,7 +146,7 @@ function compositeProject(scale = 1, opts = {}) {
     ctx.globalCompositeOperation = layer.blendMode;
     const m = layerMatrix(layer);
     ctx.transform(m.a, m.b, m.c, m.d, m.e, m.f);
-    ctx.drawImage(src, 0, 0);
+    ctx.drawImage(src, 0, 0, layer.canvas.width, layer.canvas.height);
     ctx.restore();
   }
   return c;

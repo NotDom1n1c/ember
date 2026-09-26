@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/editor.css">
+<link rel="stylesheet" href="css/editor.css?v=3">
 </head>
 <body class="editor-body">
 
@@ -19,7 +19,17 @@
   <div class="menu-group">
     <button id="btn-new" class="menu-btn">New</button>
     <button id="btn-open" class="menu-btn">Open</button>
-    <button id="btn-import" class="menu-btn" title="Add an image as a new layer">Import layer</button>
+    <button id="btn-import" class="menu-btn" title="Add an image as a new layer">Import</button>
+    <div class="dropdown">
+      <button id="btn-image" class="menu-btn">Image <span class="caret">▾</span></button>
+      <div class="dropdown-menu" id="image-menu" hidden>
+        <button id="img-resize">Resize image…</button>
+        <button id="img-rot-cw">Rotate 90° clockwise</button>
+        <button id="img-rot-ccw">Rotate 90° counter-clockwise</button>
+        <button id="img-flip-x">Flip horizontal</button>
+        <button id="img-flip-y">Flip vertical</button>
+      </div>
+    </div>
     <div class="dropdown">
       <button id="btn-save" class="menu-btn">Save <span class="caret">▾</span></button>
       <div class="dropdown-menu" id="save-menu" hidden>
@@ -107,6 +117,8 @@
       </div>
     </div>
 
+    <div id="compare-badge" hidden>ORIGINAL · release \ to see your edit</div>
+
     <div id="drop-overlay" hidden>
       <div class="drop-box">Drop to open</div>
     </div>
@@ -180,11 +192,26 @@
     <section class="tab-panel" id="tab-adjust">
       <p class="panel-note" id="adjust-note">Non-destructive — applied to the active layer on render.</p>
 
+      <h4 class="panel-sub">Looks</h4>
+      <div class="looks-grid" id="looks-grid">
+        <button class="look-btn" data-look="none"><i style="--a:#6b6b6b;--b:#d8d8d8"></i>None</button>
+        <button class="look-btn" data-look="ember"><i style="--a:#5a1d08;--b:#ffb070"></i>Ember</button>
+        <button class="look-btn" data-look="silver"><i style="--a:#111;--b:#eee"></i>Silver</button>
+        <button class="look-btn" data-look="cross"><i style="--a:#123a4a;--b:#e8ff9a"></i>Cross</button>
+        <button class="look-btn" data-look="fade"><i style="--a:#4a4650;--b:#e6ddd2"></i>Fade</button>
+        <button class="look-btn" data-look="vivid"><i style="--a:#ff2d55;--b:#2dd4ff"></i>Vivid</button>
+        <button class="look-btn" data-look="noir"><i style="--a:#000;--b:#9a9a9a"></i>Noir</button>
+        <button class="look-btn" data-look="retro"><i style="--a:#4a2e14;--b:#f3d9a6"></i>Retro</button>
+      </div>
+      <h4 class="panel-sub">Adjust</h4>
+
       <div class="slider-row"><label>Brightness</label><input type="range" id="adj-brightness" min="-100" max="100" value="0"><span class="val" id="adj-brightness-val">0</span></div>
       <div class="slider-row"><label>Contrast</label><input type="range" id="adj-contrast" min="-100" max="100" value="0"><span class="val" id="adj-contrast-val">0</span></div>
       <div class="slider-row"><label>Saturation</label><input type="range" id="adj-saturation" min="-100" max="100" value="0"><span class="val" id="adj-saturation-val">0</span></div>
       <div class="slider-row"><label>Hue</label><input type="range" id="adj-hue" min="-180" max="180" value="0"><span class="val" id="adj-hue-val">0</span></div>
       <div class="slider-row"><label>Blur</label><input type="range" id="adj-blur" min="0" max="30" value="0"><span class="val" id="adj-blur-val">0</span></div>
+      <div class="slider-row"><label>Sharpen</label><input type="range" id="adj-sharpen" min="0" max="100" value="0"><span class="val" id="adj-sharpen-val">0</span></div>
+      <div class="slider-row"><label>Vignette</label><input type="range" id="adj-vignette" min="0" max="100" value="0"><span class="val" id="adj-vignette-val">0</span></div>
 
       <div class="check-row"><label><input type="checkbox" id="adj-grayscale"> Grayscale</label></div>
       <div class="check-row"><label><input type="checkbox" id="adj-sepia"> Sepia</label></div>
@@ -194,6 +221,7 @@
         <button class="btn-ghost small" id="btn-curves">Curves…</button>
         <button class="btn-ghost small" id="btn-adj-reset">Reset all</button>
       </div>
+      <p class="panel-note">Hold <kbd>\</kbd> on the canvas to compare with the original.</p>
     </section>
 
     <!-- TOOL PROPS TAB -->
@@ -203,7 +231,11 @@
         <h4>Move / Transform</h4>
         <p class="panel-note">Drag to move. Use the handles to scale, the top handle to rotate. Click a layer's pixels to select it.</p>
         <div class="mono-readout" id="move-info">—</div>
-        <button class="btn-ghost small" id="btn-reset-transform">Reset transform</button>
+        <div class="panel-row">
+          <button class="btn-ghost small" id="btn-layer-flip-x">Flip H</button>
+          <button class="btn-ghost small" id="btn-layer-flip-y">Flip V</button>
+          <button class="btn-ghost small" id="btn-reset-transform">Reset</button>
+        </div>
       </div>
 
       <div class="props-group" id="props-crop" hidden>
@@ -342,7 +374,28 @@
     <div class="mono-readout"><span id="export-dims">—</span> · <span id="export-size">estimating…</span></div>
     <div class="modal-actions">
       <button class="btn-ghost small" id="btn-export-cancel">Cancel</button>
+      <button class="btn-ghost small" id="btn-export-copy" title="Copy the image as PNG">Copy</button>
       <button class="btn-accent small" id="btn-export-download">Download</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-resize" hidden>
+  <div class="modal">
+    <h3>Resize image</h3>
+    <div class="preset-grid">
+      <button class="ratio-btn" data-pct="25">25%</button>
+      <button class="ratio-btn" data-pct="50">50%</button>
+      <button class="ratio-btn" data-pct="75">75%</button>
+      <button class="ratio-btn" data-pct="200">200%</button>
+    </div>
+    <div class="panel-row"><label class="field-label">Width</label><input type="number" id="resize-w" min="1" max="12000"> px</div>
+    <div class="panel-row"><label class="field-label">Height</label><input type="number" id="resize-h" min="1" max="12000"> px</div>
+    <div class="check-row"><label><input type="checkbox" id="resize-lock" checked> Keep aspect ratio</label></div>
+    <p class="panel-note">Lossless: layers keep their original pixels, so you can resize back without quality loss.</p>
+    <div class="modal-actions">
+      <button class="btn-ghost small" id="btn-resize-cancel">Cancel</button>
+      <button class="btn-accent small" id="btn-resize-apply">Resize</button>
     </div>
   </div>
 </div>
@@ -368,11 +421,12 @@
 <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp,application/json,.ember" multiple hidden>
 <div id="toasts"></div>
 
-<script src="js/core.js"></script>
-<script src="js/filters.js"></script>
-<script src="js/tools.js"></script>
-<script src="js/panels.js"></script>
-<script src="js/io.js"></script>
-<script src="js/main.js"></script>
+<script src="js/core.js?v=2"></script>
+<script src="js/filters.js?v=2"></script>
+<script src="js/tools.js?v=2"></script>
+<script src="js/panels.js?v=2"></script>
+<script src="js/io.js?v=2"></script>
+<script src="js/image.js?v=2"></script>
+<script src="js/main.js?v=2"></script>
 </body>
 </html>
