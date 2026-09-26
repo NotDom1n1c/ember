@@ -312,6 +312,7 @@
           if (en.startTime < boot || /^(blob|data):/.test(en.name)) return;
           netCount++;
           $$("[data-net-count]").forEach(el => (el.textContent = netCount));
+          $$("[data-net-word]").forEach(el => (el.textContent = netCount === 1 ? "request" : "requests"));
           let host = en.name; try { host = new URL(en.name).host; } catch {}
           log(`GET ${host} (${en.initiatorType}) · download only`, "warn");
           pulse = 1;
@@ -323,7 +324,12 @@
       $("[data-uptime]").textContent = [s / 3600, (s % 3600) / 60, s % 60].map(v => String(Math.floor(v)).padStart(2, "0")).join(":");
     }, 1000);
   }
-  if (document.readyState === "complete") startMonitor(); else addEventListener("load", startMonitor);
+  // start listening once the page and its web fonts are fully loaded, so only later traffic is counted
+  const loaded = document.readyState === "complete" ? Promise.resolve() : new Promise(r => addEventListener("load", r, { once: true }));
+  const faces = ['800 1em "Bricolage Grotesque"', '700 1em "Bricolage Grotesque"', '400 1em "Instrument Sans"',
+    '600 1em "Instrument Sans"', 'italic 1em "Instrument Serif"', '400 1em "JetBrains Mono"', '500 1em "JetBrains Mono"'];
+  const fontsIn = document.fonts ? Promise.all(faces.map(f => document.fonts.load(f).catch(() => null))) : null;
+  Promise.all([loaded, fontsIn]).then(startMonitor);
 
   // oscilloscope: flat line (spikes only if a real request happens)
   const scope = $("#scope"), sg = scope.getContext("2d");
