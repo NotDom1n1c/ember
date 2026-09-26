@@ -105,7 +105,7 @@
       run(d) {
         const c = lut(norm(sCurve(7), 7));
         for (let i = 0; i < d.length; i += 4) {
-          const l = c[clamp(0.3 * d[i] + 0.59 * d[i + 1] + 0.11 * d[i + 2])];
+          const l = c[clamp(0.3 * d[i] + 0.59 * d[i + 1] + 0.11 * d[i + 2]) | 0]; // LUT index must be an integer
           d[i] = clamp(l + 6); d[i + 1] = l; d[i + 2] = clamp(l - 4);
         }
       },
