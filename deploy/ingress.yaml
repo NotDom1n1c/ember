@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ember
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: ember.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ember
+                port:
+                  name: http
