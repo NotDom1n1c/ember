@@ -11,4 +11,4 @@ labels:
 images:
   - name: app-image
     newName: ghcr.io/notdom1n1c/ember
-    newTag: sha-b14f91a
+    newTag: sha-8b87cb7
